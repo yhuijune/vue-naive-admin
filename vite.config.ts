@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
       Unocss(),
       AutoImport({
         imports: ['vue', 'vue-router'],
-        dts: 'src/auto-imports.d.ts',
+        dts: 'src/types/auto-imports.d.ts',
       }),
       Components({
         resolvers: [NaiveUiResolver()],
