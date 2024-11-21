@@ -14,10 +14,10 @@ import * as NaiveUI from 'naive-ui'
 export function setupMessage(NMessage) {
   class Message {
     static instance
+
     constructor() {
-      // 单例模式
-      if (Message.instance)
-        return Message.instance
+      /** 单例模式 */
+      if (Message.instance) return Message.instance
       Message.instance = this
       this.message = {}
       this.removeTimer = {}

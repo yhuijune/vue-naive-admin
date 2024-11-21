@@ -57,7 +57,7 @@ Vue Naive Admin 提供一套后端代码，技术栈使用 Nestjs + TypeOrm + My
 - 项目文档: [docs | vue-naive-admin](https://isme.top)
 - 接口文档: [apidoc | isme-nest-serve](https://apifox.com/apidoc/shared-ff4a4d32-c0d1-4caf-b0ee-6abc130f734a)
 
-> 注：有个比较常见的问题，就是如何添加菜单和修改菜单，由于项目是由后端控制菜单资源的，所以需要对接后端后在资源管理功能对菜单进行增删改，然后在角色管理功能给对应角色进行授权。具体如何对接后端，请参考 [项目文档](https://isme.top)。当然，可能有些菜单你不想通过权限控制，那么你可以在 `/src/settings.js` 文件添加 basePermissions，只需对齐菜单资源的结构即可，结构可以参照 [接口文档](https://apifox.com/apidoc/shared-ff4a4d32-c0d1-4caf-b0ee-6abc130f734a/api-134536978)。
+> 注：有个比较常见的问题，就是如何添加菜单和修改菜单，由于项目是由后端控制菜单资源的，所以需要对接后端后在资源管理功能对菜单进行增删改，然后在角色管理功能给对应角色进行授权。具体如何对接后端，请参考 [项目文档](https://isme.top)。当然，可能有些菜单你不想通过权限控制，那么你可以在 `/src/settings.ts` 文件添加 basePermissions，只需对齐菜单资源的结构即可，结构可以参照 [接口文档](https://apifox.com/apidoc/shared-ff4a4d32-c0d1-4caf-b0ee-6abc130f734a/api-134536978)。
 
 ## 使用这个模板开始你的项目
 

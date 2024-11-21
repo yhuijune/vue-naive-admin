@@ -1,6 +1,4 @@
-/// <reference types="vite/client" />
-
-import type { LoadingBarApi } from 'naive-ui'
+import type { DialogApi, LoadingBarApi, MessageApi, NotificationApi } from 'naive-ui'
 import 'vue-router'
 
 export { }
@@ -9,6 +7,9 @@ declare global {
   // Window
   interface Window {
     $loadingBar: LoadingBarApi
+    $notification: NotificationApi
+    $message: MessageApi
+    $dialog: DialogApi
   }
 }
 
