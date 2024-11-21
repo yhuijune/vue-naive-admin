@@ -4,6 +4,10 @@ export default antfu({
   unocss: true,
   formatters: true,
   stylistic: true,
+  extends: [
+    'eslint:recommended',
+    '@vue/eslint-config-typescript',
+  ],
   rules: {
     'n/prefer-global/process': 'off',
     'no-undef': 'error',

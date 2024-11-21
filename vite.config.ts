@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
       Unocss(),
       AutoImport({
         imports: ['vue', 'vue-router'],
-        dts: false,
+        dts: 'src/auto-imports.d.ts',
       }),
       Components({
         resolvers: [NaiveUiResolver()],
@@ -47,7 +47,6 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(process.cwd(), 'src'),
-        '~': path.resolve(process.cwd()),
       },
     },
     server: {
@@ -60,12 +59,12 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: path => path.replace(/^\/api/, ''),
           secure: false,
-          configure: (proxy, options) => {
-            // 配置此项可在响应头中看到请求的真实地址
-            proxy.on('proxyRes', (proxyRes, req) => {
-              proxyRes.headers['x-real-url'] = new URL(req.url || '', options.target)?.href || ''
-            })
-          },
+          // configure: (proxy, options) => {
+          //   // 配置此项可在响应头中看到请求的真实地址
+          //   proxy.on('proxyRes', (proxyRes, req) => {
+          //     proxyRes.headers['x-real-url'] = new URL(req.url || '', options.target)?.href || ''
+          //   })
+          // },
         },
       },
     },
