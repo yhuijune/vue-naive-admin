@@ -6,18 +6,20 @@
  * Copyright © 2023 Ronnie Zhang(大脸怪) | https://isme.top
  **********************************/
 
-export function createPageLoadingGuard(router) {
+import type { Router } from 'vue-router'
+
+export default function createPageLoadingGuard(router: Router) {
   router.beforeEach(() => {
-    $loadingBar.start()
+    window.$loadingBar.start()
   })
 
   router.afterEach(() => {
     setTimeout(() => {
-      $loadingBar.finish()
+      window.$loadingBar.finish()
     }, 200)
   })
 
   router.onError(() => {
-    $loadingBar.error()
+    window.$loadingBar.error()
   })
 }

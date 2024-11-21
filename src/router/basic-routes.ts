@@ -1,4 +1,6 @@
-export const basicRoutes = [
+import type { RouteRecordRaw } from 'vue-router'
+
+export const basicRoutes: RouteRecordRaw[] = [
   {
     name: 'Login',
     path: '/login',
