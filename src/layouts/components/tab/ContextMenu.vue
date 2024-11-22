@@ -8,20 +8,27 @@
 
 <template>
   <n-dropdown
+    :key="currentPath"
     placement="bottom-start"
-    :show
+    :show="visible"
     :x
     :y
     :options
-    @select="handleSelect"
-    @clickoutside="handleHideDropdown"
+    @select="handleSelectOption"
+    @clickoutside="hideDropdown"
   />
 </template>
 
 <script setup lang="ts">
 import { useTabStore } from '@/store'
 
-interface TabAction {
+export interface ContextMenuProps {
+  x: number
+  y: number
+  currentPath: string
+}
+
+interface TabOption {
   key: string
   label: string
   icon: string
@@ -29,34 +36,14 @@ interface TabAction {
   disabled: (store: ReturnType<typeof useTabStore>, currentPath?: string) => boolean
 }
 
-const props = defineProps({
-  show: {
-    type: Boolean,
-    default: false,
-  },
-  x: {
-    type: Number,
-    default: 0,
-  },
-  y: {
-    type: Number,
-    default: 0,
-  },
-  currentPath: {
-    type: String,
-    default: '',
-  },
-})
-
-const emit = defineEmits(['update:show'])
-
-// const visible = defineModel('show')
+const { x = 0, y = 0, currentPath = '' } = defineProps<ContextMenuProps>()
+const visible = defineModel('show')
 
 const tabStore = useTabStore()
 const route = useRoute()
 
-// 所有的操作
-const TAB_ACTIONS: TabAction[] = [
+// 操作列表
+const TAB_OPTIONS: Array<TabOption> = [
   {
     key: 'reload',
     label: '重新加载',
@@ -71,7 +58,7 @@ const TAB_ACTIONS: TabAction[] = [
     label: '关闭',
     icon: 'i-mdi:close',
     action: () => {
-      tabStore.removeTab(props.currentPath)
+      tabStore.removeTab(currentPath)
     },
     disabled: store => store.tabs.length <= 1
   },
@@ -80,7 +67,7 @@ const TAB_ACTIONS: TabAction[] = [
     label: '关闭其他',
     icon: 'i-mdi:arrow-expand-horizontal',
     action: () => {
-      tabStore.removeOtherTabs(props.currentPath)
+      tabStore.removeOtherTabs(currentPath)
     },
     disabled: store => store.tabs.length <= 1
   },
@@ -89,7 +76,7 @@ const TAB_ACTIONS: TabAction[] = [
     label: '关闭左侧',
     icon: 'i-mdi:arrow-expand-left',
     action: () => {
-      tabStore.removeLeftTabs(props.currentPath)
+      tabStore.removeLeftTabs(currentPath)
     },
     disabled: (store, path) => store.tabs.length <= 1 || path === store.tabs[0].path
   },
@@ -98,29 +85,27 @@ const TAB_ACTIONS: TabAction[] = [
     label: '关闭右侧',
     icon: 'i-mdi:arrow-expand-right',
     action: () => {
-      tabStore.removeRightTabs(props.currentPath)
+      tabStore.removeRightTabs(currentPath)
     },
     disabled: (store, path) => store.tabs.length <= 1 || path === store.tabs.at(-1)?.path
   }
 ]
 
 // 下拉菜单选项
-const options = computed(() => {
-  return TAB_ACTIONS.map(action => ({
-    key: action.key,
-    label: action.label,
-    icon: () => h('i', { class: `${action.icon} text-14` }),
-    disabled: action.disabled(tabStore, props.currentPath)
-  }))
-})
+const options = computed(() => TAB_OPTIONS.map(action => ({
+  key: action.key,
+  label: action.label,
+  icon: () => h('i', { class: `${action.icon} text-14` }),
+  disabled: action.disabled(tabStore, currentPath)
+})))
 
-function handleSelect(key) {
-  const targetAction = TAB_ACTIONS.find(tab => tab.key === key)
-  targetAction?.action?.(tabStore, props.currentPath)
-  handleHideDropdown()
+function handleSelectOption(key: TabOption['key']) {
+  const targetAction = TAB_OPTIONS.find(tab => tab.key === key)
+  targetAction?.action?.()
+  hideDropdown()
 }
 
-function handleHideDropdown() {
-  emit('update:show', false)
+function hideDropdown() {
+  visible.value = false
 }
 </script>

@@ -13,7 +13,7 @@
       type="card"
       :value="tabStore.activeTab"
       :closable="isTabClosable"
-      @close="(path) => tabStore.removeTab(path)"
+      @close="handleCloseTab"
     >
       <n-tab
         v-for="tab in tabStore.tabs"
@@ -27,16 +27,14 @@
     </n-tabs>
     <!-- 右键下拉菜单 -->
     <ContextMenu
-      v-if="contextMenuOption.show"
-      v-model:show="contextMenuOption.show"
-      :x="contextMenuOption.x"
-      :y="contextMenuOption.y"
-      :current-path="contextMenuOption.currentPath"
+      v-model:show="isShowContextMenu"
+      v-bind="contextMenuInfo"
     />
   </div>
 </template>
 
 <script setup lang="ts">
+import type { ContextMenuProps } from './ContextMenu.vue'
 import { useTabStore } from '@/store'
 import ContextMenu from './ContextMenu.vue'
 
@@ -45,34 +43,26 @@ const tabStore = useTabStore()
 
 const isTabClosable = computed(() => tabStore.tabs.length > 1)
 
-const contextMenuOption = reactive({
-  show: false,
+const isShowContextMenu = ref(false)
+const contextMenuInfo = shallowRef<ContextMenuProps>({
   x: 0,
   y: 0,
   currentPath: '',
 })
 
-function handleClickTab(path) {
+function handleCloseTab(path: string) {
+  tabStore.removeTab(path)
+}
+
+function handleClickTab(path: string) {
   router.push(path)
   tabStore.setActiveTab(path)
 }
 
-function showContextMenu() {
-  contextMenuOption.show = true
-}
-function hideContextMenu() {
-  contextMenuOption.show = false
-}
-function setContextMenu(x, y, currentPath) {
-  Object.assign(contextMenuOption, { x, y, currentPath })
-}
-
-async function handleContextMenu(evt, path) {
-  const { clientX, clientY } = evt
-  hideContextMenu()
-  setContextMenu(clientX, clientY, path)
-  await nextTick()
-  showContextMenu()
+async function handleContextMenu(evt: MouseEvent, path: string) {
+  const { clientX: x, clientY: y } = evt
+  contextMenuInfo.value = { x, y, currentPath: path }
+  isShowContextMenu.value = true
 }
 </script>
 
