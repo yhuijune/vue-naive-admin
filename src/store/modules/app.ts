@@ -67,8 +67,6 @@ export const useAppStore = defineStore('app', {
     },
   },
   persist: {
-    /** TODO: 文档上并无该配置项，待删除 */
-    // paths: ['collapsed', 'layout', 'primaryColor', 'naiveThemeOverrides'],
     storage: sessionStorage,
   },
 })

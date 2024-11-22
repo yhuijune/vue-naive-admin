@@ -13,10 +13,11 @@ export default antfu({
     'no-undef': 'error',
     'no-fallthrough': 'off',
     'vue/block-order': 'off',
-    '@typescript-eslint/no-this-alias': 'off',
     'prefer-promise-reject-errors': 'off',
     'perfectionist/sort-imports': 'off',
     'antfu/if-newline': 'off',
+    'style/brace-style': 'off',
+    'style/comma-dangle': 'off'
   },
   languageOptions: {
     globals: {

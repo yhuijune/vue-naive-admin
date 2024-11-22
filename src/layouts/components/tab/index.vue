@@ -8,39 +8,42 @@
 
 <template>
   <div>
+    <!-- 选项卡 -->
     <n-tabs
-      :value="tabStore.activeTab"
-      :closable="tabStore.tabs.length > 1"
       type="card"
+      :value="tabStore.activeTab"
+      :closable="isTabClosable"
       @close="(path) => tabStore.removeTab(path)"
     >
       <n-tab
-        v-for="item in tabStore.tabs"
-        :key="item.path"
-        :name="item.path"
-        @click="handleItemClick(item.path)"
-        @contextmenu.prevent="handleContextMenu($event, item)"
+        v-for="tab in tabStore.tabs"
+        :key="tab.path"
+        :name="tab.path"
+        @click="handleClickTab(tab.path)"
+        @contextmenu.prevent="handleContextMenu($event, tab.path)"
       >
-        {{ item.title }}
+        {{ tab.title }}
       </n-tab>
     </n-tabs>
-
+    <!-- 右键下拉菜单 -->
     <ContextMenu
       v-if="contextMenuOption.show"
       v-model:show="contextMenuOption.show"
-      :current-path="contextMenuOption.currentPath"
       :x="contextMenuOption.x"
       :y="contextMenuOption.y"
+      :current-path="contextMenuOption.currentPath"
     />
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useTabStore } from '@/store'
 import ContextMenu from './ContextMenu.vue'
 
 const router = useRouter()
 const tabStore = useTabStore()
+
+const isTabClosable = computed(() => tabStore.tabs.length > 1)
 
 const contextMenuOption = reactive({
   show: false,
@@ -49,9 +52,9 @@ const contextMenuOption = reactive({
   currentPath: '',
 })
 
-function handleItemClick(path) {
-  tabStore.setActiveTab(path)
+function handleClickTab(path) {
   router.push(path)
+  tabStore.setActiveTab(path)
 }
 
 function showContextMenu() {
@@ -64,11 +67,10 @@ function setContextMenu(x, y, currentPath) {
   Object.assign(contextMenuOption, { x, y, currentPath })
 }
 
-// 右击菜单
-async function handleContextMenu(e, tagItem) {
-  const { clientX, clientY } = e
+async function handleContextMenu(evt, path) {
+  const { clientX, clientY } = evt
   hideContextMenu()
-  setContextMenu(clientX, clientY, tagItem.path)
+  setContextMenu(clientX, clientY, path)
   await nextTick()
   showContextMenu()
 }

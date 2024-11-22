@@ -8,27 +8,31 @@
 
 <template>
   <n-dropdown
-    :show="show"
-    :options="options"
-    :x="x"
-    :y="y"
     placement="bottom-start"
-    @clickoutside="handleHideDropdown"
+    :show
+    :x
+    :y
+    :options
     @select="handleSelect"
+    @clickoutside="handleHideDropdown"
   />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useTabStore } from '@/store'
+
+interface TabAction {
+  key: string
+  label: string
+  icon: string
+  action: () => void
+  disabled: (store: ReturnType<typeof useTabStore>, currentPath?: string) => boolean
+}
 
 const props = defineProps({
   show: {
     type: Boolean,
     default: false,
-  },
-  currentPath: {
-    type: String,
-    default: '',
   },
   x: {
     type: Number,
@@ -38,89 +42,85 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  currentPath: {
+    type: String,
+    default: '',
+  },
 })
 
 const emit = defineEmits(['update:show'])
 
+// const visible = defineModel('show')
+
 const tabStore = useTabStore()
-
-const options = computed(() => [
-  {
-    label: '重新加载',
-    key: 'reload',
-    disabled: props.currentPath !== tabStore.activeTab,
-    icon: () => h('i', { class: 'i-mdi:refresh text-14' }),
-  },
-  {
-    label: '关闭',
-    key: 'close',
-    disabled: tabStore.tabs.length <= 1,
-    icon: () => h('i', { class: 'i-mdi:close text-14' }),
-  },
-  {
-    label: '关闭其他',
-    key: 'close-other',
-    disabled: tabStore.tabs.length <= 1,
-    icon: () => h('i', { class: 'i-mdi:arrow-expand-horizontal text-14' }),
-  },
-  {
-    label: '关闭左侧',
-    key: 'close-left',
-    disabled: tabStore.tabs.length <= 1 || props.currentPath === tabStore.tabs[0].path,
-    icon: () => h('i', { class: 'i-mdi:arrow-expand-left text-14' }),
-  },
-  {
-    label: '关闭右侧',
-    key: 'close-right',
-    disabled:
-      tabStore.tabs.length <= 1
-      || props.currentPath === tabStore.tabs[tabStore.tabs.length - 1].path,
-    icon: () => h('i', { class: 'i-mdi:arrow-expand-right text-14' }),
-  },
-])
-
 const route = useRoute()
-const actionMap = new Map([
-  [
-    'reload',
-    () => {
+
+// 所有的操作
+const TAB_ACTIONS: TabAction[] = [
+  {
+    key: 'reload',
+    label: '重新加载',
+    icon: 'i-mdi:refresh',
+    action: () => {
       tabStore.reloadTab(route.fullPath, route.meta?.keepAlive)
     },
-  ],
-  [
-    'close',
-    () => {
+    disabled: (store, path) => path !== store.activeTab,
+  },
+  {
+    key: 'close',
+    label: '关闭',
+    icon: 'i-mdi:close',
+    action: () => {
       tabStore.removeTab(props.currentPath)
     },
-  ],
-  [
-    'close-other',
-    () => {
-      tabStore.removeOther(props.currentPath)
+    disabled: store => store.tabs.length <= 1
+  },
+  {
+    key: 'close-other',
+    label: '关闭其他',
+    icon: 'i-mdi:arrow-expand-horizontal',
+    action: () => {
+      tabStore.removeOtherTabs(props.currentPath)
     },
-  ],
-  [
-    'close-left',
-    () => {
-      tabStore.removeLeft(props.currentPath)
+    disabled: store => store.tabs.length <= 1
+  },
+  {
+    key: 'close-left',
+    label: '关闭左侧',
+    icon: 'i-mdi:arrow-expand-left',
+    action: () => {
+      tabStore.removeLeftTabs(props.currentPath)
     },
-  ],
-  [
-    'close-right',
-    () => {
-      tabStore.removeRight(props.currentPath)
+    disabled: (store, path) => store.tabs.length <= 1 || path === store.tabs[0].path
+  },
+  {
+    key: 'close-right',
+    label: '关闭右侧',
+    icon: 'i-mdi:arrow-expand-right',
+    action: () => {
+      tabStore.removeRightTabs(props.currentPath)
     },
-  ],
-])
+    disabled: (store, path) => store.tabs.length <= 1 || path === store.tabs.at(-1)?.path
+  }
+]
+
+// 下拉菜单选项
+const options = computed(() => {
+  return TAB_ACTIONS.map(action => ({
+    key: action.key,
+    label: action.label,
+    icon: () => h('i', { class: `${action.icon} text-14` }),
+    disabled: action.disabled(tabStore, props.currentPath)
+  }))
+})
+
+function handleSelect(key) {
+  const targetAction = TAB_ACTIONS.find(tab => tab.key === key)
+  targetAction?.action?.(tabStore, props.currentPath)
+  handleHideDropdown()
+}
 
 function handleHideDropdown() {
   emit('update:show', false)
-}
-
-function handleSelect(key) {
-  const actionFn = actionMap.get(key)
-  if (typeof actionFn === 'function')
-    actionFn()
-  handleHideDropdown()
 }
 </script>

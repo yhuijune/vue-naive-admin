@@ -6,14 +6,14 @@
  * Copyright © 2023 Ronnie Zhang(大脸怪) | https://isme.top
  **********************************/
 
+import type { Router } from 'vue-router'
 import { useTabStore } from '@/store'
 
 export const EXCLUDE_TAB = ['/404', '/403', '/login']
 
-export function createTabGuard(router) {
+export function createTabGuard(router: Router) {
   router.afterEach((to) => {
-    if (EXCLUDE_TAB.includes(to.path))
-      return
+    if (EXCLUDE_TAB.includes(to.path)) return
     const tabStore = useTabStore()
     const { name, fullPath: path } = to
     const title = to.meta?.title
